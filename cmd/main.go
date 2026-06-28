@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/ishtiaqrobin/spotsync-api/config"
-	"github.com/ishtiaqrobin/spotsync-api/models"
+	"github.com/ishtiaqrobin/spotsync-api/internal/config"
+	"github.com/ishtiaqrobin/spotsync-api/internal/models"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 )
