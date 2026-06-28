@@ -1,0 +1,21 @@
+# Environment variables
+.env
+
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+spotsync-api
+tmp/
+
+# Air hot-reload
+tmp/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
