@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -22,23 +21,24 @@ func LoadEnv() *Config {
 		log.Println("No .env file found, using environment variables")
 	}
 
-	dsn := os.Getenv("DSN")
-	if dsn == "" {
-		// Build DSN from individual DB components (legacy support)
-		dsn = buildDSN()
-	}
+	// dsn := os.Getenv("DSN")
+	// if dsn == "" {
+	// 	// Build DSN from individual DB components (legacy support)
+	// 	dsn = buildDSN()
+	// }
 
 	cfg := &Config{
-		Port:      os.Getenv("PORT"),
-		Dsn:       dsn,
+		Port: os.Getenv("PORT"),
+		// Dsn:       dsn,
+		Dsn:       os.Getenv("DSN"),
 		JwtSecret: os.Getenv("JWT_SECRET"),
 	}
-	
+
 	if cfg.Port == "" {
 		cfg.Port = "8080"
 	}
 	if cfg.Dsn == "" {
-		log.Fatal("DSN environment variable is required (or set DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)")
+		log.Fatal("DSN environment variable is required")
 	}
 	if cfg.JwtSecret == "" {
 		log.Fatal("JWT_SECRET environment variable is required")
@@ -48,26 +48,26 @@ func LoadEnv() *Config {
 }
 
 // buildDSN constructs a PostgreSQL DSN string from individual environment variables
-func buildDSN() string {
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbname := os.Getenv("DB_NAME")
-	sslmode := os.Getenv("DB_SSLMODE")
+// func buildDSN() string {
+// 	host := os.Getenv("DB_HOST")
+// 	port := os.Getenv("DB_PORT")
+// 	user := os.Getenv("DB_USER")
+// 	password := os.Getenv("DB_PASSWORD")
+// 	dbname := os.Getenv("DB_NAME")
+// 	sslmode := os.Getenv("DB_SSLMODE")
 
-	if host == "" || user == "" || dbname == "" {
-		return ""
-	}
-	if port == "" {
-		port = "5432"
-	}
-	if sslmode == "" {
-		sslmode = "require"
-	}
+// 	if host == "" || user == "" || dbname == "" {
+// 		return ""
+// 	}
+// 	if port == "" {
+// 		port = "5432"
+// 	}
+// 	if sslmode == "" {
+// 		sslmode = "require"
+// 	}
 
-	return fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		host, port, user, password, dbname, sslmode,
-	)
-}
+// 	return fmt.Sprintf(
+// 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+// 		host, port, user, password, dbname, sslmode,
+// 	)
+// }
