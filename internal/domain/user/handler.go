@@ -6,6 +6,7 @@ import (
 
 	"github.com/ishtiaqrobin/spotsync-api/internal/domain/user/dto"
 	"github.com/ishtiaqrobin/spotsync-api/internal/httpresponse"
+	"github.com/ishtiaqrobin/spotsync-api/internal/validation"
 	"github.com/labstack/echo/v4"
 )
 
@@ -34,7 +35,7 @@ func (h *handler) Register(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, httpresponse.Error{
 			Code:    http.StatusBadRequest,
 			Message: "Validation failed",
-			Details: err.Error(),
+			Details: validation.ParseValidationErrors(err),
 		})
 	}
 
@@ -87,7 +88,7 @@ func (h *handler) Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, httpresponse.Error{
 			Code:    http.StatusBadRequest,
 			Message: "Validation failed",
-			Details: err.Error(),
+			Details: validation.ParseValidationErrors(err),
 		})
 	}
 

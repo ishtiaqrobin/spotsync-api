@@ -7,6 +7,7 @@ import (
 
 	"github.com/ishtiaqrobin/spotsync-api/internal/domain/reservation/dto"
 	"github.com/ishtiaqrobin/spotsync-api/internal/httpresponse"
+	"github.com/ishtiaqrobin/spotsync-api/internal/validation"
 	"github.com/labstack/echo/v4"
 )
 
@@ -37,7 +38,7 @@ func (h *handler) CreateReservation(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, httpresponse.Error{
 			Code:    http.StatusBadRequest,
 			Message: "Validation failed",
-			Details: err.Error(),
+			Details: validation.ParseValidationErrors(err),
 		})
 	}
 
