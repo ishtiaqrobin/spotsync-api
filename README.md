@@ -250,34 +250,159 @@ http://localhost:8080/api/v1
 
 ### Success Response
 
-Success responses return the DTO object directly:
+All success responses follow a standardized wrapper format:
 
 ```json
 {
-  "id": 1,
-  "name": "John Doe",
-  "email": "john@example.com",
-  "role": "driver",
-  "created_at": "2026-06-29T10:00:00+06:00",
-  "updated_at": "2026-06-29T10:00:00+06:00"
+  "success": true,
+  "message": "Operation description",
+  "data": { ... }
 }
 ```
+
+| Field     | Type           | Description                    |
+| --------- | -------------- | ------------------------------ |
+| `success` | `boolean`      | Always `true` for success      |
+| `message` | `string`       | Human-readable success message |
+| `data`    | `object/array` | Response data (DTO object)     |
+
+**Example - Register User (201 Created):**
+
+```json
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "driver",
+    "created_at": "2026-06-29T10:00:00+06:00",
+    "updated_at": "2026-06-29T10:00:00+06:00"
+  }
+}
+```
+
+**Example - Login (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "role": "driver"
+    }
+  }
+}
+```
+
+**Example - Get All Zones (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Parking zones retrieved successfully",
+  "data": [
+    {
+      "id": 1,
+      "name": "Terminal 1 EV Charging",
+      "type": "ev_charging",
+      "total_capacity": 20,
+      "available_spots": 14,
+      "price_per_hour": 5.5,
+      "created_at": "2026-06-29T10:30:00+06:00"
+    }
+  ]
+}
+```
+
+---
 
 ### Error Response
 
+All error responses follow a standardized wrapper format:
+
 ```json
 {
-  "code": 400,
-  "message": "Validation failed",
-  "details": "Key: 'RegisterRequest.Email' Error:Field validation for 'Email' failed on the 'email' tag"
+  "success": false,
+  "message": "Error description",
+  "errors": "Error details or validation errors"
 }
 ```
 
-| Field     | Type     | Description                        |
-| --------- | -------- | ---------------------------------- |
-| `code`    | `int`    | HTTP status code                   |
-| `message` | `string` | Human-readable error message       |
-| `details` | `string` | (Optional) Technical error details |
+| Field     | Type                 | Description                                                                                   |
+| --------- | -------------------- | --------------------------------------------------------------------------------------------- |
+| `success` | `boolean`            | Always `false` for errors                                                                     |
+| `message` | `string`             | Human-readable error message                                                                  |
+| `errors`  | `string/object/null` | Error details (string for simple errors, object for validation errors, `null` for no details) |
+
+**Example - Validation Error (400 Bad Request):**
+
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "errors": {
+    "errors": [
+      {
+        "field": "Email",
+        "message": "Email must be a valid email address"
+      },
+      {
+        "field": "Password",
+        "message": "Password must be at least 6 characters"
+      }
+    ]
+  }
+}
+```
+
+**Example - Authentication Error (401 Unauthorized):**
+
+```json
+{
+  "success": false,
+  "message": "Missing authorization header",
+  "errors": null
+}
+```
+
+**Example - Forbidden Error (403 Forbidden):**
+
+```json
+{
+  "success": false,
+  "message": "Admin access required",
+  "errors": null
+}
+```
+
+**Example - Not Found Error (404 Not Found):**
+
+```json
+{
+  "success": false,
+  "message": "Parking zone not found",
+  "errors": null
+}
+```
+
+**Example - Conflict Error (409 Conflict):**
+
+```json
+{
+  "success": false,
+  "message": "Parking zone is full",
+  "errors": null
+}
+```
+
+---
 
 ### HTTP Status Codes
 
