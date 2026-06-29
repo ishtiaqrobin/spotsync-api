@@ -6,7 +6,7 @@
 
 ## 🌐 Live URL
 
-**Backend:** `https://spotsync-api.onrender.com` _(Update after deployment)_
+**Backend:** `https://spotsync-api-uzl2.onrender.com`
 
 ---
 
