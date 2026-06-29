@@ -28,7 +28,7 @@ func (h *AuthHandler) Register(c echo.Context) error {
 		return utils.ErrorJSON(c, http.StatusBadRequest, "Invalid request body", err.Error())
 	}
 	if err := h.validate.Struct(req); err != nil {
-		return utils.ErrorJSON(c, http.StatusBadRequest, "Validation failed", err.Error())
+		return utils.ErrorJSON(c, http.StatusBadRequest, "Validation failed", utils.ParseValidationErrors(err))
 	}
 
 	user, err := h.authService.Register(req)
@@ -57,7 +57,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 		return utils.ErrorJSON(c, http.StatusBadRequest, "Invalid request body", err.Error())
 	}
 	if err := h.validate.Struct(req); err != nil {
-		return utils.ErrorJSON(c, http.StatusBadRequest, "Validation failed", err.Error())
+		return utils.ErrorJSON(c, http.StatusBadRequest, "Validation failed", utils.ParseValidationErrors(err))
 	}
 
 	token, user, err := h.authService.Login(req)

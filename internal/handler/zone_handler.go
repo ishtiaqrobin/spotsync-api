@@ -29,7 +29,7 @@ func (h *ZoneHandler) CreateZone(c echo.Context) error {
 		return utils.ErrorJSON(c, http.StatusBadRequest, "Invalid request body", err.Error())
 	}
 	if err := h.validate.Struct(req); err != nil {
-		return utils.ErrorJSON(c, http.StatusBadRequest, "Validation failed", err.Error())
+		return utils.ErrorJSON(c, http.StatusBadRequest, "Validation failed", utils.ParseValidationErrors(err))
 	}
 
 	zone, err := h.zoneService.CreateZone(req)
