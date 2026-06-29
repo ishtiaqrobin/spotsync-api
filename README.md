@@ -75,23 +75,44 @@ spotsync-api/
 │   │   │   ├── handler.go
 │   │   │   └── register.go        # Route registration + DI
 │   │   ├── zone/                  # Parking Zone domain
-│   │   │   └── (same structure)
+│   │   │   ├── dto/
+│   │   │   │   ├── request.go
+│   │   │   │   └── response.go
+│   │   │   ├── entity.go
+│   │   │   ├── repository.go
+│   │   │   ├── service.go
+│   │   │   ├── handler.go
+│   │   │   └── register.go
 │   │   └── reservation/           # Reservation domain
-│   │       └── (same structure)
-│   ├── httpresponse/              # Standardized error response
+│   │       ├── dto/
+│   │       │   ├── request.go
+│   │       │   └── response.go
+│   │       ├── entity.go
+│   │       ├── repository.go
+│   │       ├── service.go
+│   │       ├── handler.go
+│   │       └── register.go
+│   ├── httpresponse/              # Standardized response helpers
+│   │   ├── response.go
 │   │   └── error.go
 │   ├── middleware/                # Auth + Role middleware
 │   │   └── auth.go
-│   └── server/                    # HTTP server setup
-│       └── http.go
+│   ├── server/                    # HTTP server setup
+│   │   └── http.go
+│   └── validation/                # Validation error parsing
+│       └── error.go
 ├── postman/                       # Postman test guides
 │   ├── auth.postman.md
 │   ├── zone.postman.md
 │   └── reservation.postman.md
+├── doc/                           # Documentation
+│   └── deploy.md
+├── ref-golang/                    # Reference project (for learning)
 ├── .env                           # Environment variables (not in git)
 ├── .env.example                   # Example environment file
 ├── .gitignore
 ├── .air.toml                      # Air hot-reload config
+├── CONCEPTS.md                    # Project concepts & keywords
 ├── go.mod
 ├── go.sum
 └── README.md
@@ -103,40 +124,40 @@ spotsync-api/
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        HTTP Request                              │
+│                        HTTP Request                             │
 └─────────────────────────────────────────────────────────────────┘
                                  │
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Echo Server (server/http.go)                  │
+│                    Echo Server (server/http.go)                 │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │  Middleware: Logger → Recover → CORS → JWTAuth → Role   │   │
+│  │  Middleware: Logger → Recover → CORS → JWTAuth → Role    │   │
 │  └──────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
                                  │
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                      Handler Layer                               │
-│  (Bind request → Validate DTO → Extract JWT claims → Call Service│
-│   → Return JSON response)                                        │
+│                     Handler Layer                               │
+│ (Bind request → Validate DTO → Extract JWT claims → Call Service│
+│  → Return JSON response)                                        │
 └─────────────────────────────────────────────────────────────────┘
                                  │
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                      Service Layer                               │
-│  (Business logic: Hash passwords, Generate JWT, Check capacity,  │
-│   Enforce rules)                                                 │
+│                      Service Layer                              │
+│  (Business logic: Hash passwords, Generate JWT, Check capacity, │
+│   Enforce rules)                                                │
 └─────────────────────────────────────────────────────────────────┘
                                  │
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Repository Layer                              │
-│  (Database operations: CRUD, Transactions, Row Locks)            │
+│                    Repository Layer                             │
+│  (Database operations: CRUD, Transactions, Row Locks)           │
 └─────────────────────────────────────────────────────────────────┘
                                  │
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                      PostgreSQL (NeonDB)                         │
+│                      PostgreSQL (NeonDB)                        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
