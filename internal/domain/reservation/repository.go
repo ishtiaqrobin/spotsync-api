@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // ErrZoneFull is returned when a parking zone has no available spots
@@ -36,17 +37,21 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{db: db}
 }
 
-// CreateReservation safely creates a reservation with capacity check
+// CreateReservation safely creates a reservation by locking the zone row first,
+// preventing the "EV Spot Bottleneck" race condition.
+// Uses GORM Transaction + Row-Level Locking (FOR UPDATE).
 func (r *repository) CreateReservation(reservation *Reservation) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		var zone Zone
 
-		// 1. Find the parking zone
-		if err := tx.First(&zone, reservation.ZoneID).Error; err != nil {
+		// 1. Lock the parking zone row (SELECT ... FOR UPDATE)
+		// This prevents other transactions from reading/modifying this row until we commit
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			First(&zone, reservation.ZoneID).Error; err != nil {
 			return ErrZoneNotFound
 		}
 
-		// 2. Count current active reservations for this zone
+		// 2. Count current active reservations for this zone (inside the same transaction)
 		var activeCount int64
 		if err := tx.Model(&Reservation{}).
 			Where("zone_id = ? AND status = ?", zone.ID, "active").
