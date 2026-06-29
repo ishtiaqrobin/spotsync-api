@@ -596,7 +596,8 @@ This project is built for educational purposes as part of the Level2-B6 Mission-
 
 - GitHub: [@ishtiaqrobin](https://github.com/ishtiaqrobin)
 - Project: [spotsync-api](https://github.com/ishtiaqrobin/spotsync-api)
+- Live: [spotsync-api](https://spotsync-api-uzl2.onrender.com)
 
 ---
 
-**Built with ❤️ using Go, Echo, and GORM**
+**Built using Go, Echo, and GORM**
