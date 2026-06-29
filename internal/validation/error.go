@@ -7,24 +7,24 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-// Error represents a single validation error
-type Error struct {
+// ErrorDetail represents a single validation error
+type ErrorDetail struct {
 	Field   string `json:"field"`
 	Message string `json:"message"`
 }
 
-// ErrorResponse represents the validation error response
-type ErrorResponse struct {
-	Errors []Error `json:"errors"`
+// ValidationError represents a collection of validation errors
+type ValidationError struct {
+	Errors []ErrorDetail `json:"errors"`
 }
 
 // ParseValidationErrors converts validator errors into meaningful messages
-func ParseValidationErrors(err error) ErrorResponse {
-	var response ErrorResponse
+func ParseValidationErrors(err error) ValidationError {
+	var response ValidationError
 
 	if ve, ok := err.(validator.ValidationErrors); ok {
 		for _, fe := range ve {
-			response.Errors = append(response.Errors, Error{
+			response.Errors = append(response.Errors, ErrorDetail{
 				Field:   fe.Field(),
 				Message: formatFieldError(fe),
 			})
@@ -68,7 +68,6 @@ func formatFieldError(fe validator.FieldError) string {
 
 // formatFieldName converts CamelCase field names to readable format
 func formatFieldName(field string) string {
-	// Insert space before capital letters
 	var result strings.Builder
 	for i, r := range field {
 		if i > 0 && r >= 'A' && r <= 'Z' {

@@ -16,34 +16,22 @@ func JWTAuth(jwtService auth.JWTService) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			authHeader := c.Request().Header.Get("Authorization")
 			if authHeader == "" {
-				return c.JSON(http.StatusUnauthorized, httpresponse.Error{
-					Code:    http.StatusUnauthorized,
-					Message: "Missing authorization header",
-				})
+				return httpresponse.Fail(c, http.StatusUnauthorized, "Missing authorization header", nil)
 			}
 
 			parts := strings.Split(authHeader, " ")
 			if len(parts) != 2 || parts[0] != "Bearer" {
-				return c.JSON(http.StatusUnauthorized, httpresponse.Error{
-					Code:    http.StatusUnauthorized,
-					Message: "Invalid authorization header format",
-				})
+				return httpresponse.Fail(c, http.StatusUnauthorized, "Invalid authorization header format", nil)
 			}
 
 			claims, err := jwtService.ValidateToken(parts[1])
 			if err != nil {
-				return c.JSON(http.StatusUnauthorized, httpresponse.Error{
-					Code:    http.StatusUnauthorized,
-					Message: "Invalid or expired token",
-				})
+				return httpresponse.Fail(c, http.StatusUnauthorized, "Invalid or expired token", nil)
 			}
-			
+
 			// Reject refresh tokens from being used as access tokens
 			if claims.TokenType != auth.TokenTypeAccess {
-				return c.JSON(http.StatusUnauthorized, httpresponse.Error{
-					Code:    http.StatusUnauthorized,
-					Message: "Invalid token type",
-				})
+				return httpresponse.Fail(c, http.StatusUnauthorized, "Invalid token type", nil)
 			}
 
 			// Inject user claims into Echo context
@@ -63,10 +51,7 @@ func RequireAdmin(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role, ok := c.Get("user_role").(string)
 		if !ok || role != "admin" {
-			return c.JSON(http.StatusForbidden, httpresponse.Error{
-				Code:    http.StatusForbidden,
-				Message: "Admin access required",
-			})
+			return httpresponse.Fail(c, http.StatusForbidden, "Admin access required", nil)
 		}
 		return next(c)
 	}

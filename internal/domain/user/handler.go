@@ -24,37 +24,22 @@ func (h *handler) Register(c echo.Context) error {
 	var req dto.RegisterRequest
 
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, httpresponse.Error{
-			Code:    http.StatusBadRequest,
-			Message: "Invalid request payload",
-			Details: err.Error(),
-		})
+		return httpresponse.Fail(c, http.StatusBadRequest, "Invalid request payload", err.Error())
 	}
 
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, httpresponse.Error{
-			Code:    http.StatusBadRequest,
-			Message: "Validation failed",
-			Details: validation.ParseValidationErrors(err),
-		})
+		return httpresponse.Fail(c, http.StatusBadRequest, "Validation failed", validation.ParseValidationErrors(err))
 	}
 
 	response, err := h.service.Register(req)
 	if err != nil {
 		if errors.Is(err, ErrEmailAlreadyExists) {
-			return c.JSON(http.StatusBadRequest, httpresponse.Error{
-				Code:    http.StatusBadRequest,
-				Message: "Email already registered",
-			})
+			return httpresponse.Fail(c, http.StatusBadRequest, "Email already registered", nil)
 		}
-		return c.JSON(http.StatusInternalServerError, httpresponse.Error{
-			Code:    http.StatusInternalServerError,
-			Message: "Failed to register user",
-			Details: err.Error(),
-		})
+		return httpresponse.Fail(c, http.StatusInternalServerError, "Failed to register user", err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, response)
+	return httpresponse.Success(c, http.StatusCreated, "User registered successfully", response)
 }
 
 // GetMe returns the current authenticated user's info
@@ -63,13 +48,10 @@ func (h *handler) GetMe(c echo.Context) error {
 
 	user, err := h.service.FindByID(userID)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, httpresponse.Error{
-			Code:    http.StatusNotFound,
-			Message: "User not found",
-		})
+		return httpresponse.Fail(c, http.StatusNotFound, "User not found", nil)
 	}
 
-	return c.JSON(http.StatusOK, user)
+	return httpresponse.Success(c, http.StatusOK, "User retrieved successfully", user)
 }
 
 // Login handles user login
@@ -77,35 +59,20 @@ func (h *handler) Login(c echo.Context) error {
 	var req dto.LoginRequest
 
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, httpresponse.Error{
-			Code:    http.StatusBadRequest,
-			Message: "Invalid request payload",
-			Details: err.Error(),
-		})
+		return httpresponse.Fail(c, http.StatusBadRequest, "Invalid request payload", err.Error())
 	}
 
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, httpresponse.Error{
-			Code:    http.StatusBadRequest,
-			Message: "Validation failed",
-			Details: validation.ParseValidationErrors(err),
-		})
+		return httpresponse.Fail(c, http.StatusBadRequest, "Validation failed", validation.ParseValidationErrors(err))
 	}
 
 	response, err := h.service.Login(req)
 	if err != nil {
 		if errors.Is(err, ErrInvalidCredentials) {
-			return c.JSON(http.StatusUnauthorized, httpresponse.Error{
-				Code:    http.StatusUnauthorized,
-				Message: "Invalid email or password",
-			})
+			return httpresponse.Fail(c, http.StatusUnauthorized, "Invalid email or password", nil)
 		}
-		return c.JSON(http.StatusInternalServerError, httpresponse.Error{
-			Code:    http.StatusInternalServerError,
-			Message: "Something went wrong",
-			Details: err.Error(),
-		})
+		return httpresponse.Fail(c, http.StatusInternalServerError, "Something went wrong", err.Error())
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return httpresponse.Success(c, http.StatusOK, "Login successful", response)
 }

@@ -25,72 +25,45 @@ func (h *handler) CreateZone(c echo.Context) error {
 	var req dto.CreateZoneRequest
 
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, httpresponse.Error{
-			Code:    http.StatusBadRequest,
-			Message: "Invalid request payload",
-			Details: err.Error(),
-		})
+		return httpresponse.Fail(c, http.StatusBadRequest, "Invalid request payload", err.Error())
 	}
 
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, httpresponse.Error{
-			Code:    http.StatusBadRequest,
-			Message: "Validation failed",
-			Details: validation.ParseValidationErrors(err),
-		})
+		return httpresponse.Fail(c, http.StatusBadRequest, "Validation failed", validation.ParseValidationErrors(err))
 	}
 
 	response, err := h.service.CreateZone(req)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, httpresponse.Error{
-			Code:    http.StatusInternalServerError,
-			Message: "Failed to create parking zone",
-			Details: err.Error(),
-		})
+		return httpresponse.Fail(c, http.StatusInternalServerError, "Failed to create parking zone", err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, response)
+	return httpresponse.Success(c, http.StatusCreated, "Parking zone created successfully", response)
 }
 
 // GetAllZones handles retrieving all parking zones
 func (h *handler) GetAllZones(c echo.Context) error {
 	zones, err := h.service.GetAllZones()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, httpresponse.Error{
-			Code:    http.StatusInternalServerError,
-			Message: "Failed to fetch parking zones",
-			Details: err.Error(),
-		})
+		return httpresponse.Fail(c, http.StatusInternalServerError, "Failed to fetch parking zones", err.Error())
 	}
 
-	return c.JSON(http.StatusOK, zones)
+	return httpresponse.Success(c, http.StatusOK, "Parking zones retrieved successfully", zones)
 }
 
 // GetZoneByID handles retrieving a single parking zone by ID
 func (h *handler) GetZoneByID(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, httpresponse.Error{
-			Code:    http.StatusBadRequest,
-			Message: "Invalid zone id",
-			Details: err.Error(),
-		})
+		return httpresponse.Fail(c, http.StatusBadRequest, "Invalid zone id", err.Error())
 	}
 
 	zone, err := h.service.GetZoneByID(uint(id))
 	if err != nil {
 		if errors.Is(err, ErrZoneNotFound) {
-			return c.JSON(http.StatusNotFound, httpresponse.Error{
-				Code:    http.StatusNotFound,
-				Message: "Parking zone not found",
-			})
+			return httpresponse.Fail(c, http.StatusNotFound, "Parking zone not found", nil)
 		}
-		return c.JSON(http.StatusInternalServerError, httpresponse.Error{
-			Code:    http.StatusInternalServerError,
-			Message: "Failed to fetch parking zone",
-			Details: err.Error(),
-		})
+		return httpresponse.Fail(c, http.StatusInternalServerError, "Failed to fetch parking zone", err.Error())
 	}
 
-	return c.JSON(http.StatusOK, zone)
+	return httpresponse.Success(c, http.StatusOK, "Parking zone retrieved successfully", zone)
 }

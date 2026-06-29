@@ -6,56 +6,25 @@ Base URL: `http://localhost:8080/api/v1`
 
 ## Response Format
 
-### Success Response (direct DTO)
-
-Success responses return the DTO object directly without a wrapper.
-
-**Single Reservation:**
+### Success Response
 
 ```json
 {
-  "id": 1,
-  "user_id": 1,
-  "zone_id": 1,
-  "license_plate": "ABC-1234",
-  "status": "active",
-  "created_at": "2026-06-29T15:30:00+06:00",
-  "updated_at": "2026-06-29T15:30:00+06:00"
+  "success": true,
+  "message": "Operation description",
+  "data": { ... }
 }
-```
-
-**My Reservations (with zone info):**
-
-```json
-[
-  {
-    "id": 1,
-    "license_plate": "ABC-1234",
-    "status": "active",
-    "zone": {
-      "id": 1,
-      "name": "Terminal 1 EV Charging",
-      "type": "ev_charging"
-    },
-    "created_at": "2026-06-29T15:30:00+06:00"
-  }
-]
 ```
 
 ### Error Response
 
 ```json
 {
-  "code": 409,
-  "message": "Parking zone is full"
+  "success": false,
+  "message": "Error description",
+  "errors": "Error details"
 }
 ```
-
-| Field     | Type     | Description                        |
-| --------- | -------- | ---------------------------------- |
-| `code`    | `int`    | HTTP status code                   |
-| `message` | `string` | Human-readable error message       |
-| `details` | `string` | (Optional) Technical error details |
 
 ---
 
@@ -79,13 +48,17 @@ Success responses return the DTO object directly without a wrapper.
 
 ```json
 {
-  "id": 1,
-  "user_id": 1,
-  "zone_id": 1,
-  "license_plate": "ABC-1234",
-  "status": "active",
-  "created_at": "2026-06-29T15:30:00+06:00",
-  "updated_at": "2026-06-29T15:30:00+06:00"
+  "success": true,
+  "message": "Reservation confirmed successfully",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "zone_id": 1,
+    "license_plate": "ABC-1234",
+    "status": "active",
+    "created_at": "2026-06-29T15:30:00+06:00",
+    "updated_at": "2026-06-29T15:30:00+06:00"
+  }
 }
 ```
 
@@ -111,13 +84,17 @@ Success responses return the DTO object directly without a wrapper.
 
 ```json
 {
-  "id": 2,
-  "user_id": 1,
-  "zone_id": 2,
-  "license_plate": "XYZ-9999",
-  "status": "active",
-  "created_at": "2026-06-29T15:31:00+06:00",
-  "updated_at": "2026-06-29T15:31:00+06:00"
+  "success": true,
+  "message": "Reservation confirmed successfully",
+  "data": {
+    "id": 2,
+    "user_id": 1,
+    "zone_id": 2,
+    "license_plate": "XYZ-9999",
+    "status": "active",
+    "created_at": "2026-06-29T15:31:00+06:00",
+    "updated_at": "2026-06-29T15:31:00+06:00"
+  }
 }
 ```
 
@@ -142,8 +119,9 @@ Success responses return the DTO object directly without a wrapper.
 
 ```json
 {
-  "code": 401,
-  "message": "Missing authorization header"
+  "success": false,
+  "message": "Missing authorization header",
+  "errors": null
 }
 ```
 
@@ -169,8 +147,9 @@ Success responses return the DTO object directly without a wrapper.
 
 ```json
 {
-  "code": 404,
-  "message": "Parking zone not found"
+  "success": false,
+  "message": "Parking zone not found",
+  "errors": null
 }
 ```
 
@@ -196,16 +175,15 @@ Success responses return the DTO object directly without a wrapper.
 
 ```json
 {
-  "code": 409,
-  "message": "Parking zone is full"
+  "success": false,
+  "message": "Parking zone is full",
+  "errors": null
 }
 ```
 
-> 💡 **Note:** This error occurs when `active_reservations >= total_capacity` for the zone.
-
 ---
 
-## 6. Create Reservation — Validation Error (Missing Fields)
+## 6. Create Reservation — Validation Error (Error)
 
 - **Method:** `POST`
 - **URL:** `{{base_url}}/reservations`
@@ -225,80 +203,26 @@ Success responses return the DTO object directly without a wrapper.
 
 ```json
 {
-  "code": 400,
+  "success": false,
   "message": "Validation failed",
-  "details": "Key: 'CreateReservationRequest.ZoneID' Error:Field validation for 'ZoneID' failed on the 'required' tag"
-}
-```
-
----
-
-## 7. Create Reservation — License Plate Too Long (Error)
-
-- **Method:** `POST`
-- **URL:** `{{base_url}}/reservations`
-- **Headers:**
-  - `Content-Type: application/json`
-  - `Authorization: Bearer {{driver_token}}`
-- **Body (raw JSON):**
-
-```json
-{
-  "zone_id": 1,
-  "license_plate": "THIS-PLATE-IS-TOO-LONG-123"
-}
-```
-
-- **Expected Response (400 Bad Request):**
-
-```json
-{
-  "code": 400,
-  "message": "Validation failed",
-  "details": "Key: 'CreateReservationRequest.LicensePlate' Error:Field validation for 'LicensePlate' failed on the 'max' tag"
-}
-```
-
----
-
-## 8. Get My Reservations (Driver)
-
-- **Method:** `GET`
-- **URL:** `{{base_url}}/reservations/my-reservations`
-- **Headers:**
-  - `Authorization: Bearer {{driver_token}}`
-- **Expected Response (200 OK):**
-
-```json
-[
-  {
-    "id": 1,
-    "license_plate": "ABC-1234",
-    "status": "active",
-    "zone": {
-      "id": 1,
-      "name": "Terminal 1 EV Charging",
-      "type": "ev_charging"
-    },
-    "created_at": "2026-06-29T15:30:00+06:00"
-  },
-  {
-    "id": 2,
-    "license_plate": "XYZ-9999",
-    "status": "active",
-    "zone": {
-      "id": 2,
-      "name": "Downtown Parking",
-      "type": "general"
-    },
-    "created_at": "2026-06-29T15:31:00+06:00"
+  "errors": {
+    "errors": [
+      {
+        "field": "Zone ID",
+        "message": "Zone ID is required"
+      },
+      {
+        "field": "License Plate",
+        "message": "License Plate is required"
+      }
+    ]
   }
-]
+}
 ```
 
 ---
 
-## 9. Get My Reservations — Empty List
+## 7. Get My Reservations (Driver)
 
 - **Method:** `GET`
 - **URL:** `{{base_url}}/reservations/my-reservations`
@@ -307,14 +231,57 @@ Success responses return the DTO object directly without a wrapper.
 - **Expected Response (200 OK):**
 
 ```json
-[]
+{
+  "success": true,
+  "message": "My reservations retrieved successfully",
+  "data": [
+    {
+      "id": 1,
+      "license_plate": "ABC-1234",
+      "status": "active",
+      "zone": {
+        "id": 1,
+        "name": "Terminal 1 EV Charging",
+        "type": "ev_charging"
+      },
+      "created_at": "2026-06-29T15:30:00+06:00"
+    },
+    {
+      "id": 2,
+      "license_plate": "XYZ-9999",
+      "status": "active",
+      "zone": {
+        "id": 2,
+        "name": "Downtown Parking",
+        "type": "general"
+      },
+      "created_at": "2026-06-29T15:31:00+06:00"
+    }
+  ]
+}
 ```
-
-> 💡 **Note:** Returns empty array when user has no reservations.
 
 ---
 
-## 10. Get My Reservations — Without Auth (Error)
+## 8. Get My Reservations — Empty List
+
+- **Method:** `GET`
+- **URL:** `{{base_url}}/reservations/my-reservations`
+- **Headers:**
+  - `Authorization: Bearer {{driver_token}}`
+- **Expected Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "My reservations retrieved successfully",
+  "data": []
+}
+```
+
+---
+
+## 9. Get My Reservations — Without Auth (Error)
 
 - **Method:** `GET`
 - **URL:** `{{base_url}}/reservations/my-reservations`
@@ -323,14 +290,15 @@ Success responses return the DTO object directly without a wrapper.
 
 ```json
 {
-  "code": 401,
-  "message": "Missing authorization header"
+  "success": false,
+  "message": "Missing authorization header",
+  "errors": null
 }
 ```
 
 ---
 
-## 11. Cancel Reservation (Driver — Own Reservation)
+## 10. Cancel Reservation (Driver — Own Reservation)
 
 - **Method:** `DELETE`
 - **URL:** `{{base_url}}/reservations/1`
@@ -340,13 +308,15 @@ Success responses return the DTO object directly without a wrapper.
 
 ```json
 {
-  "message": "Reservation cancelled successfully"
+  "success": true,
+  "message": "Reservation cancelled successfully",
+  "data": null
 }
 ```
 
 ---
 
-## 12. Cancel Reservation — Not Found (Error)
+## 11. Cancel Reservation — Not Found (Error)
 
 - **Method:** `DELETE`
 - **URL:** `{{base_url}}/reservations/9999`
@@ -356,14 +326,15 @@ Success responses return the DTO object directly without a wrapper.
 
 ```json
 {
-  "code": 404,
-  "message": "Reservation not found"
+  "success": false,
+  "message": "Reservation not found",
+  "errors": null
 }
 ```
 
 ---
 
-## 13. Cancel Reservation — Forbidden (Not Owner)
+## 12. Cancel Reservation — Forbidden (Not Owner)
 
 - **Method:** `DELETE`
 - **URL:** `{{base_url}}/reservations/2`
@@ -373,32 +344,15 @@ Success responses return the DTO object directly without a wrapper.
 
 ```json
 {
-  "code": 403,
-  "message": "You can only cancel your own reservations"
-}
-```
-
-> 💡 **Note:** This error occurs when a driver tries to cancel another user's reservation.
-
----
-
-## 14. Cancel Reservation — Without Auth (Error)
-
-- **Method:** `DELETE`
-- **URL:** `{{base_url}}/reservations/1`
-- **Headers:** None
-- **Expected Response (401 Unauthorized):**
-
-```json
-{
-  "code": 401,
-  "message": "Missing authorization header"
+  "success": false,
+  "message": "You can only cancel your own reservations",
+  "errors": null
 }
 ```
 
 ---
 
-## 15. Get All Reservations (Admin Only)
+## 13. Get All Reservations (Admin Only)
 
 - **Method:** `GET`
 - **URL:** `{{base_url}}/reservations`
@@ -407,31 +361,35 @@ Success responses return the DTO object directly without a wrapper.
 - **Expected Response (200 OK):**
 
 ```json
-[
-  {
-    "id": 1,
-    "user_id": 1,
-    "zone_id": 1,
-    "license_plate": "ABC-1234",
-    "status": "cancelled",
-    "created_at": "2026-06-29T15:30:00+06:00",
-    "updated_at": "2026-06-29T15:35:00+06:00"
-  },
-  {
-    "id": 2,
-    "user_id": 1,
-    "zone_id": 2,
-    "license_plate": "XYZ-9999",
-    "status": "active",
-    "created_at": "2026-06-29T15:31:00+06:00",
-    "updated_at": "2026-06-29T15:31:00+06:00"
-  }
-]
+{
+  "success": true,
+  "message": "All reservations retrieved successfully",
+  "data": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "zone_id": 1,
+      "license_plate": "ABC-1234",
+      "status": "cancelled",
+      "created_at": "2026-06-29T15:30:00+06:00",
+      "updated_at": "2026-06-29T15:35:00+06:00"
+    },
+    {
+      "id": 2,
+      "user_id": 1,
+      "zone_id": 2,
+      "license_plate": "XYZ-9999",
+      "status": "active",
+      "created_at": "2026-06-29T15:31:00+06:00",
+      "updated_at": "2026-06-29T15:31:00+06:00"
+    }
+  ]
+}
 ```
 
 ---
 
-## 16. Get All Reservations — Driver Token (Error)
+## 14. Get All Reservations — Driver Token (Error)
 
 - **Method:** `GET`
 - **URL:** `{{base_url}}/reservations`
@@ -441,24 +399,9 @@ Success responses return the DTO object directly without a wrapper.
 
 ```json
 {
-  "code": 403,
-  "message": "Admin access required"
-}
-```
-
----
-
-## 17. Get All Reservations — Without Auth (Error)
-
-- **Method:** `GET`
-- **URL:** `{{base_url}}/reservations`
-- **Headers:** None
-- **Expected Response (401 Unauthorized):**
-
-```json
-{
-  "code": 401,
-  "message": "Missing authorization header"
+  "success": false,
+  "message": "Admin access required",
+  "errors": null
 }
 ```
 
@@ -480,10 +423,8 @@ Create Reservation এর **Tests** tab এ এই script যোগ করলে
 
 ```javascript
 const jsonData = pm.response.json();
-pm.environment.set("reservation_id", jsonData.id);
+pm.environment.set("reservation_id", jsonData.data.id);
 ```
-
-Cancel করার সময় URL এ `{{reservation_id}}` ব্যবহার করুন।
 
 ---
 

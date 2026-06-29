@@ -6,38 +6,25 @@ Base URL: `http://localhost:8080/api/v1`
 
 ## Response Format
 
-### Success Response (direct DTO)
-
-Success responses return the DTO object directly without a wrapper.
+### Success Response
 
 ```json
 {
-  "id": 1,
-  "name": "John Doe",
-  "email": "john@example.com",
-  "role": "driver",
-  "created_at": "2026-06-29T10:00:00+06:00",
-  "updated_at": "2026-06-29T10:00:00+06:00"
+  "success": true,
+  "message": "Operation description",
+  "data": { ... }
 }
 ```
 
 ### Error Response
 
-Error responses use the standardized error format from `httpresponse.Error`.
-
 ```json
 {
-  "code": 400,
-  "message": "Validation failed",
-  "details": "Key: 'RegisterRequest.Email' Error:Field validation for 'Email' failed on the 'email' tag"
+  "success": false,
+  "message": "Error description",
+  "errors": "Error details"
 }
 ```
-
-| Field     | Type     | Description                        |
-| --------- | -------- | ---------------------------------- |
-| `code`    | `int`    | HTTP status code                   |
-| `message` | `string` | Human-readable error message       |
-| `details` | `string` | (Optional) Technical error details |
 
 ---
 
@@ -62,12 +49,16 @@ Error responses use the standardized error format from `httpresponse.Error`.
 
 ```json
 {
-  "id": 1,
-  "name": "John Doe",
-  "email": "john@example.com",
-  "role": "driver",
-  "created_at": "2026-06-29T10:00:00+06:00",
-  "updated_at": "2026-06-29T10:00:00+06:00"
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "driver",
+    "created_at": "2026-06-29T10:00:00+06:00",
+    "updated_at": "2026-06-29T10:00:00+06:00"
+  }
 }
 ```
 
@@ -94,12 +85,16 @@ Error responses use the standardized error format from `httpresponse.Error`.
 
 ```json
 {
-  "id": 2,
-  "name": "Admin User",
-  "email": "admin@example.com",
-  "role": "admin",
-  "created_at": "2026-06-29T10:01:00+06:00",
-  "updated_at": "2026-06-29T10:01:00+06:00"
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "id": 2,
+    "name": "Admin User",
+    "email": "admin@example.com",
+    "role": "admin",
+    "created_at": "2026-06-29T10:01:00+06:00",
+    "updated_at": "2026-06-29T10:01:00+06:00"
+  }
 }
 ```
 
@@ -125,16 +120,18 @@ Error responses use the standardized error format from `httpresponse.Error`.
 
 ```json
 {
-  "id": 3,
-  "name": "Simple User",
-  "email": "simple@example.com",
-  "role": "driver",
-  "created_at": "2026-06-29T10:02:00+06:00",
-  "updated_at": "2026-06-29T10:02:00+06:00"
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "id": 3,
+    "name": "Simple User",
+    "email": "simple@example.com",
+    "role": "driver",
+    "created_at": "2026-06-29T10:02:00+06:00",
+    "updated_at": "2026-06-29T10:02:00+06:00"
+  }
 }
 ```
-
-> 💡 **Note:** `role` field is optional. If omitted, defaults to `"driver"`.
 
 ---
 
@@ -157,17 +154,19 @@ Error responses use the standardized error format from `httpresponse.Error`.
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJuYW1lIjoiSm9obiBEb2UiLCJlbWFpbCI6ImpvaG5AZXhhbXBsZS5jb20iLCJyb2xlIjoiZHJpdmVyIiwidG9rZW5fdHlwZSI6ImFjY2VzcyIsImV4cCI6MTc1MTI1MDQwMCwiaWF0IjoxNzUxMTY0MDAwLCJpc3MiOiJzcG90c3luYyJ9.xxx...",
-  "user": {
-    "id": 1,
-    "name": "John Doe",
-    "email": "john@example.com",
-    "role": "driver"
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "role": "driver"
+    }
   }
 }
 ```
-
-> 💡 **Tip:** Copy the `token` value and use it in subsequent requests as `Authorization: Bearer <token>`.
 
 ---
 
@@ -190,12 +189,16 @@ Error responses use the standardized error format from `httpresponse.Error`.
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJuYW1lIjoiQWRtaW4gVXNlciIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxMjUwNDAwLCJpYXQiOjE3NTExNjQwMDAsImlzcyI6InNwb3RzeW5jIn0.xxx...",
-  "user": {
-    "id": 2,
-    "name": "Admin User",
-    "email": "admin@example.com",
-    "role": "admin"
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": 2,
+      "name": "Admin User",
+      "email": "admin@example.com",
+      "role": "admin"
+    }
   }
 }
 ```
@@ -214,8 +217,7 @@ Error responses use the standardized error format from `httpresponse.Error`.
 {
   "name": "John Doe 2",
   "email": "john@example.com",
-  "password": "123456",
-  "role": "driver"
+  "password": "123456"
 }
 ```
 
@@ -223,14 +225,15 @@ Error responses use the standardized error format from `httpresponse.Error`.
 
 ```json
 {
-  "code": 400,
-  "message": "Email already registered"
+  "success": false,
+  "message": "Email already registered",
+  "errors": null
 }
 ```
 
 ---
 
-## 7. Register — Validation Error (Missing Fields)
+## 7. Register — Validation Error (Error)
 
 - **Method:** `POST`
 - **URL:** `{{base_url}}/auth/register`
@@ -250,9 +253,24 @@ Error responses use the standardized error format from `httpresponse.Error`.
 
 ```json
 {
-  "code": 400,
+  "success": false,
   "message": "Validation failed",
-  "details": "Key: 'RegisterRequest.Name' Error:Field validation for 'Name' failed on the 'required' tag"
+  "errors": {
+    "errors": [
+      {
+        "field": "Name",
+        "message": "Name is required"
+      },
+      {
+        "field": "Email",
+        "message": "Email must be a valid email address"
+      },
+      {
+        "field": "Password",
+        "message": "Password must be at least 6 characters"
+      }
+    ]
+  }
 }
 ```
 
@@ -277,40 +295,15 @@ Error responses use the standardized error format from `httpresponse.Error`.
 
 ```json
 {
-  "code": 401,
-  "message": "Invalid email or password"
+  "success": false,
+  "message": "Invalid email or password",
+  "errors": null
 }
 ```
 
 ---
 
-## 9. Login — User Not Found (Error)
-
-- **Method:** `POST`
-- **URL:** `{{base_url}}/auth/login`
-- **Headers:**
-  - `Content-Type: application/json`
-- **Body (raw JSON):**
-
-```json
-{
-  "email": "nonexistent@example.com",
-  "password": "123456"
-}
-```
-
-- **Expected Response (401 Unauthorized):**
-
-```json
-{
-  "code": 401,
-  "message": "Invalid email or password"
-}
-```
-
----
-
-## 10. Get Me (Protected Route)
+## 9. Get Me (Protected Route)
 
 - **Method:** `GET`
 - **URL:** `{{base_url}}/auth/me`
@@ -320,18 +313,22 @@ Error responses use the standardized error format from `httpresponse.Error`.
 
 ```json
 {
-  "id": 1,
-  "name": "John Doe",
-  "email": "john@example.com",
-  "role": "driver",
-  "created_at": "2026-06-29T10:00:00+06:00",
-  "updated_at": "2026-06-29T10:00:00+06:00"
+  "success": true,
+  "message": "User retrieved successfully",
+  "data": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "driver",
+    "created_at": "2026-06-29T10:00:00+06:00",
+    "updated_at": "2026-06-29T10:00:00+06:00"
+  }
 }
 ```
 
 ---
 
-## 11. Get Me — Without Token (Error)
+## 10. Get Me — Without Token (Error)
 
 - **Method:** `GET`
 - **URL:** `{{base_url}}/auth/me`
@@ -340,25 +337,9 @@ Error responses use the standardized error format from `httpresponse.Error`.
 
 ```json
 {
-  "code": 401,
-  "message": "Missing authorization header"
-}
-```
-
----
-
-## 12. Get Me — Invalid Token (Error)
-
-- **Method:** `GET`
-- **URL:** `{{base_url}}/auth/me`
-- **Headers:**
-  - `Authorization: Bearer invalidtoken123`
-- **Expected Response (401 Unauthorized):**
-
-```json
-{
-  "code": 401,
-  "message": "Invalid or expired token"
+  "success": false,
+  "message": "Missing authorization header",
+  "errors": null
 }
 ```
 
@@ -369,20 +350,13 @@ Error responses use the standardized error format from `httpresponse.Error`.
 Login request এর **Tests** tab এ এই script যোগ করলে token automatically environment variable এ save হবে:
 
 ```javascript
-// For Driver Login
 const jsonData = pm.response.json();
-pm.environment.set("driver_token", jsonData.token);
-
-// For Admin Login (use this instead)
-// const jsonData = pm.response.json();
-// pm.environment.set("admin_token", jsonData.token);
+pm.environment.set("driver_token", jsonData.data.token);
 ```
 
 ---
 
 ## Environment Variables
-
-Create a Postman environment with these variables:
 
 | Variable       | Initial Value                  | Description                    |
 | -------------- | ------------------------------ | ------------------------------ |
