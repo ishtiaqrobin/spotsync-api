@@ -21,10 +21,9 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB, cfg *config.Config) {
 	// Reservation routes (all require authentication)
 	api := e.Group("/api/v1/reservations", middleware.JWTAuth(jwtService))
 
+	// Specific routes first (before parameterized routes)
 	api.POST("", reservationHandler.CreateReservation)
 	api.GET("/my-reservations", reservationHandler.GetMyReservations)
-	api.DELETE("/:id", reservationHandler.CancelReservation)
-
-	// Admin-only route
 	api.GET("", reservationHandler.GetAllReservations, middleware.RequireAdmin)
+	api.DELETE("/:id", reservationHandler.CancelReservation)
 }

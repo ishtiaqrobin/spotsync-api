@@ -14,18 +14,11 @@ type User struct {
 	Email    string `json:"email" gorm:"type:varchar(255);uniqueIndex;not null"`
 	Password string `json:"-" gorm:"type:varchar(255);not null"`
 	Role     string `json:"role" gorm:"type:varchar(10);default:'driver'"`
-
-	// Relations
-	Reservations []Reservation `json:"reservations,omitempty" gorm:"foreignKey:UserID"`
 }
 
-// Reservation is a minimal reference for the relation (full model is in reservation domain)
-type Reservation struct {
-	gorm.Model
-	UserID       uint   `json:"user_id"`
-	ZoneID       uint   `json:"zone_id"`
-	LicensePlate string `json:"license_plate"`
-	Status       string `json:"status"`
+// TableName explicitly sets the table name
+func (User) TableName() string {
+	return "users"
 }
 
 // hashPassword hashes the user's password using bcrypt

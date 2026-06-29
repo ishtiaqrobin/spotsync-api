@@ -22,7 +22,7 @@ func (s *service) CreateReservation(userID uint, req dto.CreateReservationReques
 		Status:       "active",
 	}
 
-	if err := s.repo.CreateWithLock(&reservation); err != nil {
+	if err := s.repo.CreateReservation(&reservation); err != nil {
 		return nil, err
 	}
 

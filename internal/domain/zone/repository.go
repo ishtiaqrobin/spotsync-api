@@ -3,6 +3,7 @@ package zone
 import (
 	"errors"
 
+	"github.com/ishtiaqrobin/spotsync-api/internal/domain/reservation"
 	"gorm.io/gorm"
 )
 
@@ -51,7 +52,7 @@ func (r *repository) FindByID(id uint) (*ParkingZone, error) {
 // CountActiveReservations counts active reservations for a given zone
 func (r *repository) CountActiveReservations(zoneID uint) (int64, error) {
 	var count int64
-	err := r.db.Model(&Reservation{}).
+	err := r.db.Model(&reservation.Reservation{}).
 		Where("zone_id = ? AND status = ?", zoneID, "active").
 		Count(&count).Error
 	return count, err

@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 // ErrZoneFull is returned when a parking zone has no available spots
@@ -21,7 +20,7 @@ var ErrForbidden = errors.New("you are not allowed to perform this action")
 
 // Repository defines the interface for reservation data access
 type Repository interface {
-	CreateWithLock(reservation *Reservation) error
+	CreateReservation(reservation *Reservation) error
 	FindByUserID(userID uint) ([]Reservation, error)
 	FindAll() ([]Reservation, error)
 	FindByID(id uint) (*Reservation, error)
@@ -37,19 +36,17 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{db: db}
 }
 
-// CreateWithLock safely creates a reservation by locking the zone row first,
-// preventing the "EV Spot Bottleneck" race condition.
-func (r *repository) CreateWithLock(reservation *Reservation) error {
+// CreateReservation safely creates a reservation with capacity check
+func (r *repository) CreateReservation(reservation *Reservation) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		var zone Zone
 
-		// 1. Lock the parking zone row (SELECT ... FOR UPDATE)
-		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-			First(&zone, reservation.ZoneID).Error; err != nil {
+		// 1. Find the parking zone
+		if err := tx.First(&zone, reservation.ZoneID).Error; err != nil {
 			return ErrZoneNotFound
 		}
 
-		// 2. Count current active reservations for this zone (inside the same transaction)
+		// 2. Count current active reservations for this zone
 		var activeCount int64
 		if err := tx.Model(&Reservation{}).
 			Where("zone_id = ? AND status = ?", zone.ID, "active").

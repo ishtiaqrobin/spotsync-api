@@ -12,11 +12,16 @@ type Reservation struct {
 	UserID       uint   `json:"user_id" gorm:"not null"`
 	ZoneID       uint   `json:"zone_id" gorm:"not null"`
 	LicensePlate string `json:"license_plate" gorm:"size:15;not null"`
-	Status       string `json:"status" gorm:"type:varchar(15);default:'active';check:status IN ('active','completed','cancelled')"`
+	Status       string `json:"status" gorm:"type:varchar(15);default:'active'"`
 
 	// Relations
 	User User `json:"user,omitempty" gorm:"foreignKey:UserID"`
 	Zone Zone `json:"zone,omitempty" gorm:"foreignKey:ZoneID"`
+}
+
+// TableName explicitly sets the table name
+func (Reservation) TableName() string {
+	return "reservations"
 }
 
 // User is a minimal reference for the relation (full model is in user domain)
@@ -27,6 +32,11 @@ type User struct {
 	Role  string `json:"role"`
 }
 
+// TableName explicitly sets the table name for User struct
+func (User) TableName() string {
+	return "users"
+}
+
 // Zone is a minimal reference for the relation (full model is in zone domain)
 type Zone struct {
 	gorm.Model
@@ -34,6 +44,11 @@ type Zone struct {
 	Type          string  `json:"type"`
 	TotalCapacity int     `json:"total_capacity"`
 	PricePerHour  float64 `json:"price_per_hour"`
+}
+
+// TableName explicitly sets the table name for Zone struct
+func (Zone) TableName() string {
+	return "parking_zones"
 }
 
 // ToResponse converts a Reservation entity to a DTO response
